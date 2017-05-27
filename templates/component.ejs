@@ -1,0 +1,129 @@
+import {Component, OnInit, Input} from '@angular/core';
+import {ConfirmationService} from "primeng/components/common/api";
+
+
+@Component({
+  selector: 'app-<%= nameLower %>',
+  templateUrl: './<%= nameLower %>.component.html',
+  styleUrls: ['./<%= nameLower %>.component.css'],
+  providers: [ConfirmationService]
+
+})
+export class <%= nameTitle %>Component implements OnInit {
+
+
+  private title: string ="<%= title %>";
+  private path: string = "<%= api %>";
+  private modalCreate: boolean = false;
+  private modalEdit: boolean = false;
+  private image: string;
+  private modalImage: boolean = false;
+  private data: Array<<%= nameTitle %>>;
+  private total: number;
+  private currentPage: number;
+  private sources: Object;
+  private formObject: <%= nameTitle %>;
+
+  constructor(private restService: RestService, private confirmationService: ConfirmationService) {
+    this.sources={};
+    <%for(var i=0;i<sources.length;i++){%><%if(sources[i].type=="local"){%>
+    this.sources['<%=sources[i].name%>']=<%-JSON.stringify(sources[i].data)%>;<%}else if(sources[i].type=="api"){%>
+    this.restService.index('<%=sources[i].name%>')
+        .subscribe(response => {
+            this.sources['<%=sources[i].name%>'] = response.data;
+        })<%}%><%}%>
+    }
+
+  ngOnInit() {
+    this.initFormObject();
+    this.getData();
+  }
+
+  protected getData() {
+    this.restService.index(this.path + (this.currentPage ? "?page=" + this.currentPage : ''))
+      .subscribe(response => {
+        if(response.data.data)
+        {
+          this.total = response.data.total;
+          this.data = <Array<<%= nameTitle %>>>response.data.data;
+        }else{
+          this.data = <Array<<%= nameTitle %>>>response.data;
+        }
+
+      })
+  }
+
+  private initFormObject() {
+    this.formObject = new <%= nameTitle %>();
+  }
+
+
+  private removeData(id: number) {
+    this.restService.remove(this.path, id)
+      .subscribe(response => {
+        this.getData();
+      })
+  }
+
+  private handleRowExpand(data) {
+    this.restService.show(this.path, data.id)
+      .subscribe(response => {
+        this.showData = response.data;
+      })
+  }
+
+  private handlePaginator(event) {
+    this.currentPage = (event.page + 1);
+    this.getData();
+  }
+
+  private showImage(image: string) {
+    this.image = image ? image : "assets/img/no-image.png";
+    this.modalImage = true;
+  }
+
+  private removeItem(id: number) {
+    this.confirmationService.confirm({
+      message: 'Deseas eliminar este elemento',
+      header: 'Eliminar Elemento',
+      icon: 'fa fa-trash',
+      accept: () => {
+        this.removeData(id);
+      }
+    });
+  }
+
+  private saveItem() {
+    this.restService.create(this.path, this.formObject)
+      .subscribe(response => {
+        this.modalCreate = false;
+        this.formObject = {};
+        this.getData();
+      })
+  }
+
+
+
+  private updateItem() {
+    this.restService.update(this.path, this.formObject['id'], this.formObject)
+      .subscribe(response => {
+        this.modalEdit = false;
+        this.formObject = {};
+        this.getData();
+      })
+  }
+
+  openModalCreate() {
+    this.formObject = {};
+    this.modalCreate = true;
+  }
+
+  openModalEdit(id: number) {
+    this.restService.show(this.path, id)
+      .subscribe(response => {
+        this.formObject = response.data;
+        this.modalEdit = true;
+      })
+
+  }
+}

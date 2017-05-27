@@ -1,0 +1,6 @@
+
+export class <%= name %> {
+    <%for(var i=0;i<fields.length;i++) { if(fields[i].type=="object") {%>
+      <%= fields[i].name%>:string;<%} else{%>
+      <%= fields[i].name%>:<%= fields[i].type%>;<%}%><%}%>
+}

@@ -1,0 +1,156 @@
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-nav-tabs">
+                    <div class="card-header" data-background-color="blue">
+                        <div class="nav-tabs-navigation ">
+                            <div class="nav-tabs-wrapper">
+                                <span class="nav-tabs-title">{{title}}</span>
+                                <ul class="nav nav-tabs">
+                                    <li class="pull-right">
+                                        <a (click)="openModalCreate()" data-toggle="tab">
+                                            <i class="material-icons">add_circle</i>Crear
+                                            <div class="ripple-container"></div>
+                                        </a>
+                                    </li>
+                                    <li class="pull-right">
+                                        <a (click)="getData()" data-toggle="tab">
+                                            <i class="material-icons">autorenew</i>Recargar
+                                            <div class="ripple-container"></div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <p-dataTable [value]="data" expandableRows="true" (onRowExpand)="handleRowExpand($event.data)">
+                            <p-column expander="true" [style]="{'width':'30px'}"></p-column>
+                            <% for(var i = 0;i < fields.length;i++) { %>
+                            <p-column field="<%= fields[i].name %>" header="<%= fields[i].title %>">
+                                <% if (fields[i].type === 'string') { %>
+                                <ng-template let-col let-car="rowData" let-ri="rowIndex" pTemplate="body">
+                                    <span>{{car[col.field]}}</span>
+                                </ng-template>
+                                <% } else if (fields[i].type === 'number') { %>
+                                <ng-template let-col let-car="rowData" let-ri="rowIndex" pTemplate="body">
+                                    <span>{{car[col.field]}}</span>
+                                </ng-template>
+                                <% } else if (fields[i].type === 'object') { %>
+                                <ng-template let-col let-car="rowData" let-ri="rowIndex" pTemplate="body">
+                                    <span>{{sources.<%-fields[i].source%>[car[col.field]].name}}</span>
+                                </ng-template><%}%>
+                            </p-column>
+                            <% } %>
+
+                            <p-column field="id" header="">
+                                <ng-template let-col let-car="rowData" let-ri="rowIndex" pTemplate="body">
+                                    <button type="button" class="btn btn-success btn-icon"
+                                            (click)="openModalEdit(car[col.field])">
+                                        <i class="material-icons">mode_edit</i>
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-icon"
+                                            (click)="removeItem(car[col.field])">
+                                        <i class="material-icons">delete_forever</i>
+                                    </button>
+                                </ng-template>
+                            </p-column>
+                        </p-dataTable>
+                        <p-paginator *ngIf="total>10" rows="10" [totalRecords]="total"
+                                     (onPageChange)="handlePaginator($event)"></p-paginator>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [(visible)]="modalImage" modal="true" appendTo="body">
+    <img class="img-responsive" [src]="image"/>
+</p-dialog>
+<p-confirmDialog width="425" appendTo="body" modal="true" acceptLabel="Si" rejectLabel="No"></p-confirmDialog>
+
+<p-dialog [(visible)]="modalCreate" modal="true" showHeader="false" width="1000" responsive="true" appendTo="body">
+    <form method="post" #createForm="ngForm">
+        <div class="row"><% for(var i = 0;i < fields.length;i++) { %><% if (fields[i].form) { %>
+            <div class="col-lg-4 col-md-6"><% if (fields[i].type === 'string') { %>
+                <div class="form-group form-black label-floating is-empty">
+                    <label class="control-label"><%= fields[i].title %></label>
+                    <input type="text"
+                           class="form-control"
+                           [(ngModel)]="formObject.<%= fields[i].name %>" name="<%- fields[i].name %>"
+                    <% if(fields[i].form.validators){ Object.keys(fields[i].form.validators).forEach(function(prop) { %><%- prop %>="<%= fields[i].form.validators[prop] %>"<% });} %>>
+                </div><% } else if (fields[i].type === 'number') { %>
+                <div class="form-group form-black label-floating is-empty">
+                    <label class="control-label"><%= fields[i].title %></label>
+                    <input type="number"
+                           class="form-control"
+                           [(ngModel)]="formObject.<%= fields[i].name %>" name="<%- fields[i].name %>"
+                    <% if(fields[i].form.validators){ Object.keys(fields[i].form.validators).forEach(function(prop) { %><%- prop %>="<%= fields[i].form.validators[prop] %>"<% });} %>>
+                </div><% } else if (fields[i].type === 'object') { %>
+                <div class="form-group form-black label-floating is-empty">
+                    <label class="control-label"><%= fields[i].title %></label>
+                    <select class="form-control" [(ngModel)]="formObject.<%= fields[i].name %>"
+                            name="<%- fields[i].name %>">
+                        <option *ngFor="let item of sources.<%= fields[i].source %>" [value]="item.id">{{item.name}}
+                        </option>
+                    </select>
+                </div><% } %>
+            </div><% } %><% } %>
+        </div>
+    </form>
+    <p-footer>
+        <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+            <button type="button" class="btn btn-success btn-icon" (click)="saveItem()"
+                    [disabled]="!createForm.form.valid">
+                <i class="material-icons">save</i> Guardar
+                <div class="ripple-container"></div>
+            </button>
+        </div>
+    </p-footer>
+</p-dialog>
+<!---modal edit-->
+<p-dialog [(visible)]="modalEdit" modal="true" showHeader="false" width="1000" responsive="true" appendTo="body">
+    <form method="post" #editForm="ngForm">
+        <div class="row"><% for(var i = 0;i < fields.length;i++) { %><% if (fields[i].form && fields[i].form.editable){ %>
+            <div class="col-lg-4 col-md-6"><% if (fields[i].type === 'string') { %>
+                <div class="form-group form-black label-floating is-empty">
+                    <label class="control-label"><%= fields[i].title %></label>
+                    <input type="text"
+                           class="form-control"
+                           [(ngModel)]="formObject.<%= fields[i].name %>" name="<%- fields[i].name %>"
+                    <% if(fields[i].form.validators){ Object.keys(fields[i].form.validators).forEach(function(prop) { %><%- prop %>="<%= fields[i].form.validators[prop] %>"<% });} %>
+                    >
+                </div><% } else if (fields[i].type === 'number') { %>
+                <div class="form-group form-black label-floating is-empty">
+                    <label class="control-label"><%= fields[i].title %></label>
+                    <input type="number"
+                           class="form-control"
+                           [(ngModel)]="formObject.<%= fields[i].name %>" name="<%- fields[i].name %>"
+                    <% if(fields[i].form.validators){ Object.keys(fields[i].form.validators).forEach(function(prop) { %><%- prop %>="<%= fields[i].form.validators[prop] %>"<% });} %>>
+                </div><% } else if (fields[i].type === 'object') { %>
+                <div class="form-group form-black label-floating is-empty">
+                    <label class="control-label"><%= fields[i].title %></label>
+                    <select class="form-control" [(ngModel)]="formObject.<%= fields[i].name %>"
+                            name="<%- fields[i].name %>">
+                        <option *ngFor="let item of sources.<%= fields[i].source %>" [value]="item.id">{{item.name}}
+                        </option>
+                    </select>
+                </div><% } %>
+            </div><% } %>
+            <% } %>
+        </div>
+    </form>
+
+    <p-footer>
+        <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+            <button type="button" class="btn btn-success btn-icon" (click)="updateItem()"
+                    [disabled]="!editForm.form.valid">
+                <i class="material-icons">save</i> Actualizar
+                <div class="ripple-container"></div>
+            </button>
+        </div>
+    </p-footer>
+</p-dialog>

@@ -1,0 +1,92 @@
+{
+  "path": "/home/andresdkm/Documentos/Angular2Projects/client/src/app",
+  "path_models": "models",
+  "path_components": "pages/home",
+  "sources":[
+    {
+      "type":"api",
+      "name":"vehicle_types"
+    },
+    {
+      "type":"api",
+      "name":"vehicle_statuses"
+    },
+    {
+      "type":"api",
+      "name":"brands"
+    },
+    {
+      "type":"api",
+      "name":"groups"
+    }
+
+  ],
+  "entities": [
+    {
+      "entityName": "vehicles",
+      "title": "Vehiculos",
+      "api_path": "vehicles",
+      "fields": [
+        {
+          "title": "Identificacion",
+          "name": "id",
+          "type": "string",
+          "table": {
+            "format": "text"
+          },
+          "form": {
+            "editable": true
+          }
+        },
+        {
+          "title": "Placa",
+          "name": "name",
+          "type": "string",
+          "form": {
+            "editable": true,
+            "validators": {
+              "min": 0,
+              "maxlength": 20
+            }
+          }
+        },
+        {
+          "title": "Tipo",
+          "name": "type_id",
+          "type": "object",
+          "source":"vehicle_types",
+          "form": {
+            "editable": true
+          }
+        },
+        {
+          "title": "Estado",
+          "name": "vehicle_status_id",
+          "type": "object",
+          "source":"vehicle_statuses",
+          "form": {
+            "editable": true
+          }
+        },
+        {
+          "title": "Marca",
+          "name": "brand_id",
+          "type": "object",
+          "source":"brands",
+          "form": {
+            "editable": true
+          }
+        },
+        {
+          "title": "Modelo",
+          "name": "group_id",
+          "type": "object",
+          "source":"groups",
+          "form": {
+            "editable": true
+          }
+        }
+      ]
+    }
+  ]
+}
