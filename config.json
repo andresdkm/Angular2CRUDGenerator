@@ -30,18 +30,15 @@
         {
           "title": "Identificacion",
           "name": "id",
-          "type": "string",
-          "table": {
-            "format": "text"
-          },
-          "form": {
-            "editable": true
-          }
+          "type": "number"
         },
         {
           "title": "Placa",
           "name": "name",
           "type": "string",
+          "table": {
+            "format": "text"
+          },
           "form": {
             "editable": true,
             "validators": {
@@ -54,6 +51,9 @@
           "title": "Tipo",
           "name": "type_id",
           "type": "object",
+          "table": {
+            "format": "object"
+          },
           "source":"vehicle_types",
           "form": {
             "editable": true
@@ -63,6 +63,9 @@
           "title": "Estado",
           "name": "vehicle_status_id",
           "type": "object",
+          "table": {
+            "format": "object"
+          },
           "source":"vehicle_statuses",
           "form": {
             "editable": true
@@ -72,6 +75,9 @@
           "title": "Marca",
           "name": "brand_id",
           "type": "object",
+          "table": {
+            "format": "object"
+          },
           "source":"brands",
           "form": {
             "editable": true
@@ -82,6 +88,9 @@
           "name": "group_id",
           "type": "object",
           "source":"groups",
+          "table": {
+            "format": "object"
+          },
           "form": {
             "editable": true
           }

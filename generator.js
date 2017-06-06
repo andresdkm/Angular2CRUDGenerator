@@ -11,7 +11,13 @@ function titleCase(str) {
     }).join(' ');
 }
 
-
+function dropPlural(name) {
+    if(name.charAt(name.length-1)=='s')
+    {
+        name=name.substr(0, name.length-1);
+    }
+    return name;
+}
 
 
 function generateModels(config)
@@ -25,13 +31,14 @@ function generateModels(config)
         if (err) { console.log(err); return false; }
         for(var i=0;i<config.entities.length;i++)
         {
+            var name=dropPlural(config.entities[i].entityName);
             var ejs_string = data,
                 template = ejs.compile(ejs_string),
                 model = template({
-                    name:titleCase(config.entities[i].entityName),
+                    name:titleCase(name),
                     fields:config.entities[i].fields
                 });
-            fs.writeFile(dir+"/"+config.entities[i].entityName.toLowerCase()+ '.model.ts', model, function(err) {
+            fs.writeFile(dir+"/"+name.toLowerCase()+ '.model.ts', model, function(err) {
                 if(err) { console.log(err); return false }
                 return true;
             });
@@ -47,7 +54,8 @@ function generateComponent(config)
         if (err) { console.log(err); return false; }
         for(var i=0;i<config.entities.length;i++)
         {
-            var dir = config.path+"/"+config.path_components+"/"+config.entities[i].entityName.toLowerCase();
+            var name=dropPlural(config.entities[i].entityName);
+            var dir = config.path+"/"+config.path_components+"/"+name.toLowerCase();
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, 0744);
             }
@@ -56,12 +64,12 @@ function generateComponent(config)
                 model = template({
                     title:config.entities[i].title,
                     api:config.entities[i].api_path,
-                    nameLower:config.entities[i].entityName.toLowerCase(),
-                    nameTitle:titleCase(config.entities[i].entityName),
+                    nameLower:name.toLowerCase(),
+                    nameTitle:titleCase(name),
                     fields:config.entities[i].fields,
                     sources:config.sources?config.sources:[]
                 });
-            fs.writeFile(dir+"/"+config.entities[i].entityName.toLowerCase()+ '.component.ts', model, function(err) {
+            fs.writeFile(dir+"/"+name.toLowerCase()+ '.component.ts', model, function(err) {
                 if(err) { console.log(err); return false }
                 return true;
             });
@@ -72,7 +80,8 @@ function generateComponent(config)
         if (err) { console.log(err); return false; }
         for(var i=0;i<config.entities.length;i++)
         {
-            var dir = config.path+"/"+config.path_components+"/"+config.entities[i].entityName.toLowerCase();
+            var name=dropPlural(config.entities[i].entityName);
+            var dir = config.path+"/"+config.path_components+"/"+name.toLowerCase();
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir, 0744);
             }
@@ -81,11 +90,11 @@ function generateComponent(config)
                 model = template({
                     title:config.entities[i].title,
                     api:config.entities[i].api_path,
-                    nameLower:config.entities[i].entityName.toLowerCase(),
-                    nameTitle:titleCase(config.entities[i].entityName),
+                    nameLower:name.toLowerCase(),
+                    nameTitle:titleCase(name),
                     fields:config.entities[i].fields
                 });
-            fs.writeFile(dir+"/"+config.entities[i].entityName.toLowerCase()+ '.view.html', model, function(err) {
+            fs.writeFile(dir+"/"+name.toLowerCase()+ '.component.html', model, function(err) {
                 if(err) { console.log(err); return false }
                 return true;
             });

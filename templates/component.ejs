@@ -5,7 +5,7 @@ import {ConfirmationService} from "primeng/components/common/api";
 @Component({
   selector: 'app-<%= nameLower %>',
   templateUrl: './<%= nameLower %>.component.html',
-  styleUrls: ['./<%= nameLower %>.component.css'],
+  //styleUrls: ['./<%= nameLower %>.component.css'],
   providers: [ConfirmationService]
 
 })
@@ -16,6 +16,7 @@ export class <%= nameTitle %>Component implements OnInit {
   private path: string = "<%= api %>";
   private modalCreate: boolean = false;
   private modalEdit: boolean = false;
+  private modalSee: boolean = false;
   private image: string;
   private modalImage: boolean = false;
   private data: Array<<%= nameTitle %>>;
@@ -23,6 +24,10 @@ export class <%= nameTitle %>Component implements OnInit {
   private currentPage: number;
   private sources: Object;
   private formObject: <%= nameTitle %>;
+  private createPermission:boolean=true;
+  private removePermission:boolean=true;
+  private editPermission:boolean=true;
+  private seePermission:boolean=true;
 
   constructor(private restService: RestService, private confirmationService: ConfirmationService) {
     this.sources={};
@@ -65,12 +70,6 @@ export class <%= nameTitle %>Component implements OnInit {
       })
   }
 
-  private handleRowExpand(data) {
-    this.restService.show(this.path, data.id)
-      .subscribe(response => {
-        this.showData = response.data;
-      })
-  }
 
   private handlePaginator(event) {
     this.currentPage = (event.page + 1);
@@ -97,7 +96,7 @@ export class <%= nameTitle %>Component implements OnInit {
     this.restService.create(this.path, this.formObject)
       .subscribe(response => {
         this.modalCreate = false;
-        this.formObject = {};
+        this.formObject = new <%= nameTitle %>();
         this.getData();
       })
   }
@@ -105,16 +104,16 @@ export class <%= nameTitle %>Component implements OnInit {
 
 
   private updateItem() {
-    this.restService.update(this.path, this.formObject['id'], this.formObject)
+    this.restService.update(this.path, this.formObject.id, this.formObject)
       .subscribe(response => {
         this.modalEdit = false;
-        this.formObject = {};
+        this.formObject = new <%= nameTitle %>();
         this.getData();
       })
   }
 
   openModalCreate() {
-    this.formObject = {};
+    this.formObject = new <%= nameTitle %>();
     this.modalCreate = true;
   }
 
