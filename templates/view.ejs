@@ -27,23 +27,22 @@
                     <div class="card-content">
                         <p-dataTable [value]="data">
                             <% for(var i = 0;i < fields.length;i++) { %>
-                            <% if (fields[i].table) {%>
+                            <% if (fields[i].table) { %>
                             <p-column field="<%= fields[i].name %>" header="<%= fields[i].title %>">
                                 <% if (fields[i].table.format === 'text') { %>
                                 <ng-template let-col let-car="rowData" let-ri="rowIndex" pTemplate="body">
                                     <span>{{car[col.field]}}</span>
-                                </ng-template>
-                                <% } else if (fields[i].table.format === 'object') { %>
+                                </ng-template><% } else if (fields[i].table.format === 'object') { %>
                                 <ng-template let-col let-car="rowData" let-ri="rowIndex" pTemplate="body">
-                                    <span *ngIf="sources.<%-fields[i].source%>[car[col.field]]">{{sources.<%-fields[i].source%>[car[col.field]].name}}</span>
+                                    <span *ngIf="sources.<%- fields[i].source %>[car[col.field]]">{{sources.<%- fields[i].source %>
+                                        [car[col.field]].name}}</span>
                                 </ng-template><% } else if (fields[i].table.format === 'image') { %>
                                 <ng-template let-col let-car="rowData" let-ri="rowIndex" pTemplate="body">
                                     <button class="btn btn-facebook btn-icon" (click)="showImage(car[col.field]);">
                                         <i class="fa fa-file-image-o"></i>
                                     </button>
-                                </ng-template><%}%>
-                            </p-column>
-                                <% } %><% } %>
+                                </ng-template><% } %>
+                            </p-column><% } %><% } %>
                             <p-column field="id" header="" *ngIf="seePermission || editPermission || removePermission">
                                 <ng-template let-col let-car="rowData" let-ri="rowIndex" pTemplate="body">
                                     <button type="button" class="btn btn-success btn-icon" *ngIf="editPermission"
@@ -77,22 +76,35 @@
         Crear {{title}}
     </p-header>
     <form method="post" #createForm="ngForm">
-        <div class="row"><% for(var i = 0;i < fields.length;i++) { %><% if (fields[i].form) { %>
-            <div class="col-lg-4 col-md-6"><% if (fields[i].type === 'string') { %>
+        <div class="row">
+            <% for(var i = 0;i < fields.length;i++) { %>
+            <% if (fields[i].form) { %>
+            <% if (fields[i].type === 'string') { %>
+            <div class="col-lg-4 col-md-6">
                 <div class="form-group form-black label-floating is-empty">
                     <label class="control-label"><%= fields[i].title %></label>
                     <input type="text"
                            class="form-control"
                            [(ngModel)]="formObject.<%= fields[i].name %>" name="<%- fields[i].name %>"
-                    <% if(fields[i].form.validators){ Object.keys(fields[i].form.validators).forEach(function(prop) { %><%- prop %>="<%= fields[i].form.validators[prop] %>"<% });} %>>
-                </div><% } else if (fields[i].type === 'number') { %>
+                    <% if(fields[i].form.validators){ Object.keys(fields[i].form.validators).forEach(function(prop) { %>
+                    <%- prop %>="<%= fields[i].form.validators[prop] %>"
+                    <% });} %>>
+                </div>
+            </div>
+            <% } else if (fields[i].type === 'number') { %>
+            <div class="col-lg-4 col-md-6">
                 <div class="form-group form-black label-floating is-empty">
                     <label class="control-label"><%= fields[i].title %></label>
                     <input type="number"
                            class="form-control"
                            [(ngModel)]="formObject.<%= fields[i].name %>" name="<%- fields[i].name %>"
-                    <% if(fields[i].form.validators){ Object.keys(fields[i].form.validators).forEach(function(prop) { %><%- prop %>="<%= fields[i].form.validators[prop] %>"<% });} %>>
-                </div><% } else if (fields[i].type === 'object') { %>
+                    <% if(fields[i].form.validators){ Object.keys(fields[i].form.validators).forEach(function(prop) { %>
+                    <%- prop %>="<%= fields[i].form.validators[prop] %>"
+                    <% });} %>>
+                </div>
+            </div>
+            <% } else if (fields[i].type === 'object') { %>
+            <div class="col-lg-4 col-md-6">
                 <div class="form-group form-black label-floating is-empty">
                     <label class="control-label"><%= fields[i].title %></label>
                     <select class="form-control" [(ngModel)]="formObject.<%= fields[i].name %>"
@@ -100,9 +112,23 @@
                         <option *ngFor="let item of sources.<%= fields[i].source %>" [value]="item.id">{{item.name}}
                         </option>
                     </select>
-                </div><% } %>
-            </div><% } %><% } %>
-        </div>
+                </div>
+            </div><% }%><% } %><% } %>
+        </div><% for(var i = 0;i < fields.length;i++) { %><% if (fields[i].form) { %><% if (fields[i].type === 'file') { %>
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <div class="form-group form-black label-floating is-empty">
+                    <p-fileUpload name="file" url="<%- path_upload %>" (onUpload)="onUpload($event,'<%- fields[i].name%>')"
+                                 auto="true" accept="image/*" maxFileSize="1000000" chooseLabel="Elegir">
+                        <ng-template pTemplate type="content">
+                            <ul *ngIf="uploadedFiles.length">
+                                <li *ngFor="let file of uploadedFiles">{{file.name}} - {{file.size}} bytes</li>
+                            </ul>
+                        </ng-template>
+                    </p-fileUpload>
+                </div>
+            </div>
+        </div><% } %><% } %><% } %>
     </form>
     <p-footer>
         <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
@@ -120,23 +146,33 @@
         Editar {{title}}
     </p-header>
     <form method="post" #editForm="ngForm">
-        <div class="row"><% for(var i = 0;i < fields.length;i++) { %><% if (fields[i].form && fields[i].form.editable){ %>
-            <div class="col-lg-4 col-md-6"><% if (fields[i].type === 'string') { %>
+        <div class="row">
+            <% for(var i = 0;i < fields.length;i++) { %>
+            <% if (fields[i].form && fields[i].form.editable){ %>
+            <div class="col-lg-4 col-md-6">
+                <% if (fields[i].type === 'string') { %>
                 <div class="form-group form-black">
                     <label class="control-label"><%= fields[i].title %></label>
                     <input type="text"
                            class="form-control"
                            [(ngModel)]="formObject.<%= fields[i].name %>" name="<%- fields[i].name %>"
-                    <% if(fields[i].form.validators){ Object.keys(fields[i].form.validators).forEach(function(prop) { %><%- prop %>="<%= fields[i].form.validators[prop] %>"<% });} %>
+                    <% if(fields[i].form.validators){ Object.keys(fields[i].form.validators).forEach(function(prop) { %>
+                    <%- prop %>="<%= fields[i].form.validators[prop] %>"
+                    <% });} %>
                     >
-                </div><% } else if (fields[i].type === 'number') { %>
+                </div>
+                <% } else if (fields[i].type === 'number') { %>
                 <div class="form-group form-black">
                     <label class="control-label"><%= fields[i].title %></label>
                     <input type="number"
                            class="form-control"
                            [(ngModel)]="formObject.<%= fields[i].name %>" name="<%- fields[i].name %>"
-                    <% if(fields[i].form.validators){ Object.keys(fields[i].form.validators).forEach(function(prop) { %><%- prop %>="<%= fields[i].form.validators[prop] %>"<% });} %>>
-                </div><% } else if (fields[i].type === 'object') { %>
+                    <% if(fields[i].form.validators){ Object.keys(fields[i].form.validators).forEach(function(prop) { %>
+                    <%- prop %>="<%= fields[i].form.validators[prop] %>"
+                    <% });} %>
+                    >
+                </div>
+                <% } else if (fields[i].type === 'object') { %>
                 <div class="form-group form-black">
                     <label class="control-label"><%= fields[i].title %></label>
                     <select class="form-control" [(ngModel)]="formObject.<%= fields[i].name %>"
@@ -144,8 +180,10 @@
                         <option *ngFor="let item of sources.<%= fields[i].source %>" [value]="item.id">{{item.name}}
                         </option>
                     </select>
-                </div><% } %>
-            </div><% } %>
+                </div>
+                <% } %>
+            </div>
+            <% } %>
             <% } %>
         </div>
     </form>

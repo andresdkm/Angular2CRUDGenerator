@@ -28,6 +28,8 @@ export class <%= nameTitle %>Component implements OnInit {
   private removePermission:boolean=true;
   private editPermission:boolean=true;
   private seePermission:boolean=true;
+  private uploadedFiles: any[] = [];
+
 
   constructor(private restService: RestService, private confirmationService: ConfirmationService) {
     this.sources={};
@@ -125,4 +127,19 @@ export class <%= nameTitle %>Component implements OnInit {
       })
 
   }
+  onUpload(event,name) {
+    console.log(event,name);
+    if(event.xhr && event.xhr.status==200)
+    {
+      let data=JSON.parse(event.xhr.response);
+      this.formObject[name]=data.data.url;
+      console.log(this.formObject);
+      for(let file of event.files) {
+      this.uploadedFiles.push(file);
+      }
+    }
+
+  }
+
+
 }

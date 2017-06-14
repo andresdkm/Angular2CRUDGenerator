@@ -67,7 +67,8 @@ function generateComponent(config)
                     nameLower:name.toLowerCase(),
                     nameTitle:titleCase(name),
                     fields:config.entities[i].fields,
-                    sources:config.sources?config.sources:[]
+                    sources:config.sources?config.sources:[],
+                    path_upload:config.path_upload_files
                 });
             fs.writeFile(dir+"/"+name.toLowerCase()+ '.component.ts', model, function(err) {
                 if(err) { console.log(err); return false }
@@ -92,7 +93,9 @@ function generateComponent(config)
                     api:config.entities[i].api_path,
                     nameLower:name.toLowerCase(),
                     nameTitle:titleCase(name),
-                    fields:config.entities[i].fields
+                    fields:config.entities[i].fields,
+                    path_upload:config.path_upload_files
+
                 });
             fs.writeFile(dir+"/"+name.toLowerCase()+ '.component.html', model, function(err) {
                 if(err) { console.log(err); return false }

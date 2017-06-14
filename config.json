@@ -1,7 +1,8 @@
 {
-  "path": "/home/andresdkm/Documentos/Angular2Projects/client/src/app",
+  "path": "/home/andresdkm/Documentos/Angular2Projects/exit-client/src/app",
   "path_models": "models",
   "path_components": "pages/home",
+  "path_upload_files":"http://exit.app/api/updateResource",
   "sources":[
     {
       "type":"api",
