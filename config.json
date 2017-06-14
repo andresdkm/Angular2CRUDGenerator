@@ -48,6 +48,17 @@
           }
         },
         {
+          "title": "Imagen",
+          "name": "image",
+          "type": "file",
+          "table": {
+            "format": "image"
+          },
+          "form": {
+            "editable": true
+          }
+        },
+        {
           "title": "Tipo",
           "name": "type_id",
           "type": "object",
